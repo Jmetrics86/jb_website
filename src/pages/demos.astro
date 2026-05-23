@@ -1,12 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import analyticsData from "../data/analytics.json";
 ---
 
 <Layout title="Interactive Demos | Jason Brewster">
     <main class="max-w-4xl mx-auto px-6 py-20">
         <h1 class="text-5xl font-extrabold text-slate-900 mb-12">Interactive Demos</h1>
         
-        <!-- Sentiment Demo -->
+        <!-- Sentiment Demo (Existing) -->
         <section class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm mb-12">
             <h2 class="text-2xl font-bold mb-4">ML Sentiment Predictor (Pyodide)</h2>
             <p class="text-slate-600 mb-6">This demo uses Python running directly in your browser to analyze sentiment.</p>
@@ -15,6 +16,21 @@ import Layout from "../layouts/Layout.astro";
             <button id="analyzeBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Analyze Sentiment</button>
             
             <div id="result" class="mt-4 font-bold text-lg"></div>
+        </section>
+
+        <!-- SQL & Analytics Demo (New) -->
+        <section class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm mb-12">
+            <h2 class="text-2xl font-bold mb-4">SQL Analytics (BigQuery)</h2>
+            <p class="text-slate-600 mb-4">This demonstrates SQL capability. The chart below is rendered from static data, representing the result of the query shown.</p>
+            
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg mb-6 overflow-x-auto text-sm">
+<code>SELECT category, SUM(sales) as total_sales
+FROM transactions
+GROUP BY category
+ORDER BY total_sales DESC;</code>
+            </pre>
+
+            <canvas id="analyticsChart"></canvas>
         </section>
         
         <a href="/" class="text-blue-600 font-bold hover:underline">← Back Home</a>
@@ -42,6 +58,23 @@ import Layout from "../layouts/Layout.astro";
             const text = document.getElementById('textInput').value;
             const result = pyodide.globals.get('analyze')(text);
             document.getElementById('result').innerText = `Sentiment: ${result}`;
+        });
+    </script>
+
+    <!-- Load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script define:vars={{ analyticsData }}>
+        const ctx = document.getElementById('analyticsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: analyticsData.map(d => d.category),
+                datasets: [{
+                    label: 'Total Sales ($)',
+                    data: analyticsData.map(d => d.sales),
+                    backgroundColor: '#1a73e8'
+                }]
+            }
         });
     </script>
 </Layout>

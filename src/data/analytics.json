@@ -1,0 +1,6 @@
+[
+  {"category": "Apparel", "sales": 1500},
+  {"category": "Electronics", "sales": 2200},
+  {"category": "Home", "sales": 800},
+  {"category": "Books", "sales": 1200}
+]
