@@ -1,0 +1,47 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Interactive Demos | Jason Brewster">
+    <main class="max-w-4xl mx-auto px-6 py-20">
+        <h1 class="text-5xl font-extrabold text-slate-900 mb-12">Interactive Demos</h1>
+        
+        <!-- Sentiment Demo -->
+        <section class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm mb-12">
+            <h2 class="text-2xl font-bold mb-4">ML Sentiment Predictor (Pyodide)</h2>
+            <p class="text-slate-600 mb-6">This demo uses Python running directly in your browser to analyze sentiment.</p>
+            
+            <textarea id="textInput" class="w-full p-4 border border-slate-300 rounded-lg mb-4" placeholder="Enter a product review..."></textarea>
+            <button id="analyzeBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Analyze Sentiment</button>
+            
+            <div id="result" class="mt-4 font-bold text-lg"></div>
+        </section>
+        
+        <a href="/" class="text-blue-600 font-bold hover:underline">← Back Home</a>
+    </main>
+
+    <!-- Load Pyodide -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.0/full/pyodide.js"></script>
+    <script>
+        async function setup() {
+            const pyodide = await loadPyodide();
+            await pyodide.runPythonAsync(`
+                def analyze(text):
+                    text = text.lower()
+                    if "good" in text or "great" in text or "love" in text:
+                        return "Positive"
+                    return "Negative"
+            `);
+            return pyodide;
+        }
+
+        const pyodideReady = setup();
+
+        document.getElementById('analyzeBtn').addEventListener('click', async () => {
+            const pyodide = await pyodideReady;
+            const text = document.getElementById('textInput').value;
+            const result = pyodide.globals.get('analyze')(text);
+            document.getElementById('result').innerText = `Sentiment: ${result}`;
+        });
+    </script>
+</Layout>
